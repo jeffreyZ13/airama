@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>A.Irama — App Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#0D9E89;--teal-l:#5DCAA5;--teal-d:#085041;
+  --gold:#F0A500;--gold-m:#D4A853;
+  --mid:#0A1628;--navy:#0F2040;--card:#132440;--card2:#0D1E34;
+  --rule:#1A2E42;--muted:#8AAFC8;--sand:#E8E0D4;--fog:#F5F2EE;
+  --kayu:#8B4513;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;min-height:100vh;background:#0A0E18;
+  font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+
+/* ── PHONE SHELL ── */
+.shell-wrap{display:flex;justify-content:center;align-items:flex-start;
+  padding:32px 16px 48px;min-height:100vh;background:#0A0E18;}
+.phone{width:390px;min-height:844px;background:var(--mid);border-radius:44px;
+  overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px #1A2E42,0 40px 120px rgba(0,0,0,.8),0 0 80px rgba(13,158,137,.08);
+  flex-shrink:0;}
+.notch{width:120px;height:34px;background:#060C18;border-radius:0 0 20px 20px;
+  margin:0 auto;position:relative;z-index:10;}
+
+/* ── STATUS BAR ── */
+.status-bar{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 24px 0;font-size:12px;font-weight:500;color:#fff;}
+.status-time{font-size:15px;font-weight:600;}
+.status-icons{display:flex;gap:5px;align-items:center;}
+
+/* ── SCREEN SYSTEM ── */
+.screen{display:none;flex-direction:column;min-height:760px;animation:fadeIn .35s ease;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ── NAV BAR (bottom) ── */
+.nav-bar{display:flex;justify-content:space-around;align-items:center;
+  padding:12px 0 20px;border-top:1px solid var(--rule);background:var(--mid);
+  position:sticky;bottom:0;z-index:20;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:4px 16px;border-radius:12px;transition:all .2s;}
+.nav-item svg{width:22px;height:22px;stroke:#3A5A72;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s;}
+.nav-item span{font-size:10px;color:#3A5A72;transition:color .2s;}
+.nav-item.active svg{stroke:var(--teal);}
+.nav-item.active span{color:var(--teal);}
+
+/* ── TYPOGRAPHY ── */
+.eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--teal);font-weight:500;margin-bottom:6px;}
+.display{font-family:'Playfair Display',serif;color:#fff;line-height:1.18;}
+.section-title{font-size:18px;font-weight:500;color:#fff;}
+
+/* ══════════════════════════════════════════
+   SCREEN 1 — ONBOARDING / WELCOME
+══════════════════════════════════════════ */
+#sc-welcome{background:var(--mid);padding:0;}
+.welcome-hero{position:relative;height:340px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;overflow:hidden;}
+.welcome-rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.welcome-rings svg{position:absolute;}
+@keyframes ring-pulse{0%,100%{transform:scale(1);opacity:.15;}50%{transform:scale(1.06);opacity:.28;}}
+.ring1{animation:ring-pulse 3s ease-in-out infinite;}
+.ring2{animation:ring-pulse 3s ease-in-out infinite .8s;}
+.ring3{animation:ring-pulse 3s ease-in-out infinite 1.6s;}
+.welcome-mark{position:relative;z-index:2;text-align:center;}
+.wm-dots{display:flex;align-items:flex-end;gap:3px;justify-content:center;margin-bottom:14px;}
+.wm-dot{border-radius:50%;background:var(--teal-l);}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+.welcome-mark{animation:float 4s ease-in-out infinite;}
+.wm-wordmark{font-size:36px;font-family:'DM Sans',sans-serif;font-weight:700;color:var(--teal);}
+.wm-wordmark span{font-weight:300;color:#fff;}
+.welcome-body{padding:0 28px 0;flex:1;}
+.welcome-cta{padding:0 24px 12px;}
+.btn-primary{width:100%;background:var(--teal);color:#fff;border:none;border-radius:14px;
+  padding:16px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;
+  transition:all .15s;display:block;}
+.btn-primary:active{transform:scale(.98);background:#0b8a78;}
+.btn-secondary{width:100%;background:transparent;color:var(--muted);border:1px solid var(--rule);
+  border-radius:14px;padding:14px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;
+  margin-top:10px;display:block;transition:all .15s;}
+.btn-secondary:active{background:var(--card);}
+
+/* ══════════════════════════════════════════
+   SCREEN 2 — SESSION / HOME
+══════════════════════════════════════════ */
+#sc-home{background:var(--mid);padding:0 20px;}
+.home-header{display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0 10px;}
+.greeting{font-size:13px;color:var(--muted);}
+.greeting-name{font-size:18px;font-weight:500;color:#fff;margin-top:1px;}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--teal);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;}
+.mode-pills{display:flex;gap:8px;margin-bottom:16px;}
+.mode-pill{flex:1;background:var(--card);border-radius:12px;padding:12px;cursor:pointer;
+  text-align:center;border:1px solid var(--rule);transition:all .2s;}
+.mode-pill.active{background:var(--teal);border-color:var(--teal);}
+.mode-pill .mp-icon{font-size:18px;margin-bottom:4px;}
+.mode-pill .mp-name{font-size:11px;font-weight:500;color:#fff;}
+.mode-pill .mp-sub{font-size:9px;color:rgba(255,255,255,.6);}
+.mode-pill:not(.active) .mp-name{color:var(--muted);}
+.mode-pill:not(.active) .mp-sub{color:#3A5A72;}
+
+/* Coherence card */
+.coh-card{background:var(--card);border-radius:20px;padding:20px;margin-bottom:16px;
+  position:relative;overflow:hidden;}
+.coh-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--teal);}
+.coh-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.coh-ring-wrap{display:flex;align-items:center;gap:20px;}
+.coh-ring svg{display:block;}
+@keyframes ring-draw{from{stroke-dashoffset:283;}to{stroke-dashoffset:80;}}
+.ring-progress{animation:ring-draw 2s .3s ease-out forwards;}
+.coh-stats{flex:1;}
+.coh-num{font-size:42px;font-weight:500;color:#fff;line-height:1;}
+.coh-unit{font-size:14px;color:var(--teal);margin-top:2px;}
+.coh-trend{font-size:12px;color:var(--teal-l);margin-top:6px;}
+.coh-delta{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* Instrument tiles */
+.inst-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:10px;}
+.inst-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.inst-tile{background:var(--card);border-radius:12px;padding:12px;
+  border:1px solid var(--rule);cursor:pointer;transition:all .2s;}
+.inst-tile.active{background:var(--teal);border-color:var(--teal);}
+.inst-tile.secondary{background:var(--card2);border-color:var(--teal);border-width:.5px;}
+.it-name{font-size:12px;font-weight:500;color:#fff;}
+.it-role{font-size:10px;color:var(--muted);margin-top:2px;}
+.it-hz{font-size:9px;color:var(--teal-l);margin-top:4px;}
+.inst-tile.active .it-role,.inst-tile.active .it-hz{color:rgba(255,255,255,.75);}
+.inst-tile:not(.active):not(.secondary) .it-name{color:#3A5A72;}
+
+/* Start button */
+.start-btn{width:100%;background:var(--teal);border:none;border-radius:16px;
+  padding:18px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;
+  color:#fff;cursor:pointer;transition:all .15s;margin-bottom:8px;}
+.start-btn:active{transform:scale(.98);}
+
+/* ══════════════════════════════════════════
+   SCREEN 3 — LIVE SESSION
+══════════════════════════════════════════ */
+#sc-session{background:var(--mid);padding:0 20px 0;}
+.session-header{display:flex;justify-content:space-between;align-items:center;padding:14px 0 8px;}
+.session-mode{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:500;}
+.session-timer{font-size:28px;font-weight:300;color:#fff;}
+.session-timer-label{font-size:9px;color:var(--muted);text-align:right;}
+
+/* Big ring */
+.big-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0;}
+.big-ring svg{display:block;}
+@keyframes bigRing{from{stroke-dashoffset:440;}to{stroke-dashoffset:132;}}
+.big-arc{animation:bigRing 3s .2s ease-out forwards;}
+@keyframes scorePop{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+.score-pop{animation:scorePop .6s .8s ease-out both;}
+
+/* Arc progress bar */
+.arc-bar{margin-top:10px;margin-bottom:12px;}
+.arc-bar-label{display:flex;justify-content:space-between;font-size:10px;
+  color:var(--muted);margin-bottom:5px;}
+.arc-bar-track{height:5px;background:var(--rule);border-radius:3px;overflow:hidden;}
+.arc-bar-fill{height:5px;background:var(--teal);border-radius:3px;width:42%;
+  position:relative;transition:width 3s ease;}
+@keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(400%);}}
+.arc-bar-fill::after{content:'';position:absolute;top:0;left:0;width:40%;height:100%;
+  background:rgba(255,255,255,.25);animation:shimmer 2s ease-in-out infinite;}
+
+/* Live instrument tiles */
+.live-insts{display:flex;gap:6px;margin-bottom:14px;}
+.li-tile{flex:1;background:var(--card);border-radius:10px;padding:8px 6px;
+  text-align:center;border:1px solid var(--rule);transition:all .3s;}
+.li-tile.on{background:var(--teal);border-color:var(--teal);}
+.li-tile.warm{background:var(--card2);border-color:var(--teal-l);}
+.li-name{font-size:10px;font-weight:500;color:#fff;}
+.li-state{font-size:8px;color:var(--muted);margin-top:2px;}
+.li-tile.on .li-state{color:rgba(255,255,255,.75);}
+.li-tile:not(.on):not(.warm) .li-name{color:#3A5A72;}
+.li-tile:not(.on):not(.warm) .li-state{color:#1A2E42;}
+
+/* EEG wave */
+.eeg-card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;}
+.eeg-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.eeg-live{color:var(--teal-l);display:flex;align-items:center;gap:4px;}
+.eeg-dot{width:6px;height:6px;border-radius:50%;background:var(--teal-l);
+  animation:blink 1s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.eeg-wave{width:100%;height:48px;position:relative;overflow:hidden;}
+.eeg-canvas{display:block;width:100%;height:100%;}
+
+/* End button */
+.end-btn{width:100%;background:transparent;border:1px solid var(--rule);
+  border-radius:14px;padding:14px;font-family:'DM Sans',sans-serif;font-size:14px;
+  color:var(--muted);cursor:pointer;transition:all .2s;}
+.end-btn:active{background:var(--card);}
+
+/* ══════════════════════════════════════════
+   SCREEN 4 — SEMANGAT
+══════════════════════════════════════════ */
+#sc-semangat{background:#070400;padding:0 20px;align-items:center;justify-content:center;}
+.semangat-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;overflow:hidden;}
+@keyframes goldRing{0%,100%{transform:scale(1);opacity:.08;}50%{transform:scale(1.12);opacity:.18;}}
+.sg-ring1{animation:goldRing 2.5s ease-in-out infinite;}
+.sg-ring2{animation:goldRing 2.5s ease-in-out infinite .7s;}
+.sg-ring3{animation:goldRing 2.5s ease-in-out infinite 1.4s;}
+.semangat-content{position:relative;z-index:2;text-align:center;width:100%;}
+.semangat-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;}
+@keyframes fullRing{from{stroke-dashoffset:440;}to{stroke-dashoffset:0;}}
+.gold-arc{animation:fullRing 2s .2s ease-out forwards;}
+@keyframes goldScore{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.gold-score{animation:goldScore .8s .8s ease-out both;}
+.semangat-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;
+  color:var(--gold-m);line-height:1.5;margin:16px 0;padding:0 12px;}
+.semangat-stats{display:flex;gap:8px;margin-top:16px;}
+.ss-card{flex:1;background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);
+  border-radius:12px;padding:12px;text-align:center;}
+.ss-n{font-size:22px;font-weight:500;color:var(--gold);}
+.ss-l{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-m);margin-top:2px;}
+.share-btn{width:100%;background:var(--gold);border:none;border-radius:14px;padding:15px;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#050300;
+  cursor:pointer;margin-top:16px;transition:all .15s;}
+.share-btn:active{transform:scale(.98);}
+
+/* ══════════════════════════════════════════
+   SCREEN 5 — DASHBOARD
+══════════════════════════════════════════ */
+#sc-dash{background:var(--mid);padding:0 20px;}
+.dash-header{padding:14px 0 10px;}
+.dash-title{font-size:20px;font-weight:500;color:#fff;}
+.dash-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* Score cards */
+.score-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.score-card{background:var(--card);border-radius:14px;padding:14px 10px;text-align:center;}
+.score-card.gold-card{background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);}
+.sc-num{font-size:26px;font-weight:500;color:var(--teal);}
+.sc-num.gold{color:var(--gold);}
+.sc-label{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.sc-sub{font-size:10px;color:var(--teal-l);margin-top:2px;}
+
+/* Trend chart */
+.trend-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px;}
+.trend-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.trend-title{font-size:12px;font-weight:500;color:var(--teal-l);}
+.trend-range{font-size:10px;color:var(--muted);}
+.chart-area{position:relative;height:80px;}
+.chart-canvas{display:block;width:100%;height:100%;}
+.chart-days{display:flex;justify-content:space-between;margin-top:4px;}
+.chart-day{font-size:8px;color:#3A5A72;}
+.chart-day.today{color:var(--teal);}
+
+/* Band breakdown */
+.band-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px;}
+.band-title{font-size:12px;font-weight:500;color:var(--teal-l);margin-bottom:12px;}
+.band-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.band-name{font-size:11px;color:var(--muted);width:44px;flex-shrink:0;}
+.band-track{flex:1;height:7px;background:var(--navy);border-radius:4px;overflow:hidden;}
+.band-fill{height:7px;border-radius:4px;transition:width 1.5s ease;}
+.band-pct{font-size:11px;width:32px;text-align:right;flex-shrink:0;}
+
+/* Insight card */
+.insight-card{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.15);
+  border-radius:14px;padding:14px;margin-bottom:14px;}
+.insight-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-m);margin-bottom:6px;}
+.insight-text{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* ══════════════════════════════════════════
+   SCREEN 6 — PROFILE
+══════════════════════════════════════════ */
+#sc-profile{background:var(--mid);padding:0 20px;}
+.profile-header{padding:14px 0 16px;display:flex;gap:14px;align-items:center;}
+.profile-avatar{width:56px;height:56px;border-radius:50%;background:var(--teal);
+  display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#fff;}
+.profile-name{font-size:18px;font-weight:500;color:#fff;}
+.profile-tier{font-size:11px;color:var(--teal);margin-top:2px;}
+.profile-streak{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* RL progress */
+.rl-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px;}
+.rl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.rl-title{font-size:12px;font-weight:500;color:var(--teal-l);}
+.rl-pct{font-size:12px;color:var(--teal);}
+.rl-track{height:8px;background:var(--navy);border-radius:4px;overflow:hidden;margin-bottom:8px;}
+.rl-fill{height:8px;background:var(--teal);border-radius:4px;width:82%;
+  transition:width 1.5s ease;}
+.rl-desc{font-size:10px;color:#3A5A72;line-height:1.4;}
+
+/* Semangat grid */
+.sg-grid-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px;}
+.sg-grid-title{font-size:12px;font-weight:500;color:var(--teal-l);margin-bottom:10px;}
+.sg-grid{display:flex;flex-wrap:wrap;gap:5px;}
+.sg-cell{width:28px;height:28px;border-radius:6px;background:var(--navy);}
+.sg-cell.reached{background:var(--gold);}
+.sg-cell.partial{background:var(--card2);border:1px solid rgba(240,165,0,.3);}
+.sg-legend{display:flex;gap:12px;margin-top:8px;}
+.sg-leg{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted);}
+.sg-leg-dot{width:8px;height:8px;border-radius:2px;}
+
+/* Settings list */
+.settings-list{background:var(--card);border-radius:16px;overflow:hidden;margin-bottom:14px;}
+.settings-item{display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .15s;}
+.settings-item:last-child{border-bottom:none;}
+.settings-item:active{background:var(--card2);}
+.si-left{display:flex;align-items:center;gap:10px;}
+.si-icon{width:30px;height:30px;border-radius:8px;background:var(--navy);
+  display:flex;align-items:center;justify-content:center;}
+.si-icon svg{width:16px;height:16px;stroke:var(--teal);fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;}
+.si-text{font-size:13px;color:#fff;}
+.si-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.si-right{font-size:12px;color:var(--muted);}
+
+/* Toggle */
+.toggle{width:44px;height:26px;background:var(--teal);border-radius:13px;
+  position:relative;cursor:pointer;transition:background .2s;}
+.toggle-knob{width:20px;height:20px;border-radius:50%;background:#fff;
+  position:absolute;top:3px;left:21px;transition:left .2s;}
+.toggle.off{background:var(--rule);}
+.toggle.off .toggle-knob{left:3px;}
+</style>
+</head>
+<body>
+<div class="shell-wrap">
+<div class="phone">
+  <div class="notch"></div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#fff"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" opacity=".3"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="none" stroke="#fff" stroke-width="1.5"><path d="M1 3.5C3.5 1 7.5 1 10 3.5M3 6C4.5 4.5 7 4.5 8.5 6M5.5 8.5L7.5 10.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0" y="1" width="21" height="10" rx="3" stroke="#fff" stroke-width="1.5"/><rect x="22" y="3.5" width="2" height="5" rx="1" fill="#fff" opacity=".5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="#fff"/></svg>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: WELCOME ══ -->
+  <div class="screen active" id="sc-welcome">
+    <div class="welcome-hero">
+      <div class="welcome-rings">
+        <svg class="ring1" width="280" height="280" viewBox="0 0 280 280"><circle cx="140" cy="140" r="130" fill="none" stroke="#0D9E89" stroke-width="1"/></svg>
+        <svg class="ring2" width="210" height="210" viewBox="0 0 210 210"><circle cx="105" cy="105" r="95" fill="none" stroke="#0D9E89" stroke-width="1"/></svg>
+        <svg class="ring3" width="140" height="140" viewBox="0 0 140 140"><circle cx="70" cy="70" r="60" fill="none" stroke="#0D9E89" stroke-width="1"/></svg>
+      </div>
+      <div class="welcome-mark">
+        <div class="wm-dots">
+          <div class="wm-dot" style="width:7px;height:7px;opacity:.28;"></div>
+          <div class="wm-dot" style="width:10px;height:10px;opacity:.42;"></div>
+          <div class="wm-dot" style="width:14px;height:14px;opacity:.60;"></div>
+          <div class="wm-dot" style="width:19px;height:19px;opacity:.78;"></div>
+          <div class="wm-dot" style="width:24px;height:24px;opacity:1;"></div>
+          <div class="wm-dot" style="width:19px;height:19px;opacity:.78;"></div>
+          <div class="wm-dot" style="width:14px;height:14px;opacity:.60;"></div>
+          <div class="wm-dot" style="width:10px;height:10px;opacity:.42;"></div>
+          <div class="wm-dot" style="width:7px;height:7px;background:var(--gold);opacity:.9;"></div>
+        </div>
+        <div class="wm-wordmark">A.I<span>rama</span></div>
+      </div>
+    </div>
+    <div class="welcome-body">
+      <div class="eyebrow" style="text-align:center;">EEG Neurofeedback · AI · Malay Tradition</div>
+      <h1 class="display" style="font-size:26px;text-align:center;margin-bottom:12px;">Your brain already knows<br/>the rhythm.</h1>
+      <p style="font-size:13px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:24px;">A.Irama converts your brainwaves into traditional Malay music — and uses AI to guide you into deep, personalised calm.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--card);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:var(--teal);font-weight:600;">1</div>
+          <div><div style="font-size:13px;font-weight:500;color:#fff;">Put on the headband</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">6 dry sensors read your brain in 30 seconds</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--card);border:1px solid var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:var(--teal);font-weight:600;">2</div>
+          <div><div style="font-size:13px;font-weight:500;color:#fff;">The music begins</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">AI adapts Malay instruments to your brain state</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(240,165,0,.1);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:var(--gold);font-weight:600;">3</div>
+          <div><div style="font-size:13px;font-weight:500;color:var(--gold);">Reach Semangat</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Peak neural coherence — the gold LED flashes</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="welcome-cta">
+      <button class="btn-primary" onclick="showScreen('sc-home')">Get started</button>
+      <button class="btn-secondary" onclick="showScreen('sc-home')">I have an account</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: HOME ══ -->
+  <div class="screen" id="sc-home">
+    <div class="home-header">
+      <div><div class="greeting">Good morning,</div><div class="greeting-name">Jeffrey</div></div>
+      <div class="avatar">JZ</div>
+    </div>
+    <div class="mode-pills">
+      <div class="mode-pill active" id="mp-med" onclick="selectMode('med')">
+        <div class="mp-icon">🧘</div>
+        <div class="mp-name">Meditation</div>
+        <div class="mp-sub">Buka Panggung</div>
+      </div>
+      <div class="mode-pill" id="mp-focus" onclick="selectMode('focus')">
+        <div class="mp-icon">🎯</div>
+        <div class="mp-name">Focus</div>
+        <div class="mp-sub">Always-on</div>
+      </div>
+      <div class="mode-pill" id="mp-sleep" onclick="selectMode('sleep')">
+        <div class="mp-icon">🌙</div>
+        <div class="mp-name">Sleep</div>
+        <div class="mp-sub">Wind down</div>
+      </div>
+    </div>
+    <div class="coh-card">
+      <div class="coh-label">Last session · 78 coherence</div>
+      <div class="coh-ring-wrap">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="#0D1E34" stroke="#1A2E42" stroke-width="8"/>
+          <circle class="ring-progress" cx="50" cy="50" r="45" fill="none" stroke="#0D9E89" stroke-width="8"
+            stroke-dasharray="283" stroke-dashoffset="283" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+          <text x="50" y="46" text-anchor="middle" font-size="22" font-weight="500" fill="#fff" font-family="DM Sans,sans-serif">78</text>
+          <text x="50" y="60" text-anchor="middle" font-size="9" fill="#8AAFC8" font-family="DM Sans,sans-serif">coherence</text>
+        </svg>
+        <div class="coh-stats">
+          <div class="coh-unit">+12 from last week</div>
+          <div class="coh-trend">↑ Alpha: 72% · Theta: 55%</div>
+          <div class="coh-delta">Semangat reached today</div>
+          <div style="display:flex;gap:4px;margin-top:8px;">
+            <div style="background:var(--teal);border-radius:4px;padding:3px 8px;font-size:9px;color:#fff;">Gong</div>
+            <div style="background:var(--teal);border-radius:4px;padding:3px 8px;font-size:9px;color:#fff;">Rebab</div>
+            <div style="background:var(--card2);border-radius:4px;padding:3px 8px;font-size:9px;color:var(--muted);">Gendang</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="inst-label">AI instrument selection</div>
+    <div class="inst-grid">
+      <div class="inst-tile active"><div class="it-name">Gong</div><div class="it-role">Frontal baseline</div><div class="it-hz">40 Hz drone</div></div>
+      <div class="inst-tile active"><div class="it-name">Rebab</div><div class="it-role">Alpha flow</div><div class="it-hz">8.4 Hz</div></div>
+      <div class="inst-tile secondary"><div class="it-name">Gendang</div><div class="it-role">Sync rhythm</div><div class="it-hz">AI-driven</div></div>
+      <div class="inst-tile"><div class="it-name">Serunai</div><div class="it-role">Event marker</div><div class="it-hz">Standby</div></div>
+    </div>
+    <button class="start-btn" onclick="showScreen('sc-session')">Begin session · 20 min</button>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="showScreen('sc-home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="nav-item active" onclick="showScreen('sc-home')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span>Session</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('sc-dash')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Stats</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('sc-profile')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: LIVE SESSION ══ -->
+  <div class="screen" id="sc-session">
+    <div class="session-header">
+      <div><div class="session-mode" id="sessionModeLabel">Meditation · Buka Panggung</div><div style="font-size:13px;color:var(--muted);margin-top:2px;">Session in progress</div></div>
+      <div><div class="session-timer" id="sessionTimer">18:44</div><div class="session-timer-label">remaining</div></div>
+    </div>
+    <div class="big-ring-wrap">
+      <svg id="sessionRingSvg" width="220" height="220" viewBox="0 0 220 220">
+        <circle cx="110" cy="110" r="96" fill="#0D1E34" stroke="#1A2E42" stroke-width="12"/>
+        <circle cx="110" cy="110" r="80" fill="none" stroke="#0F2A22" stroke-width="6"/>
+        <circle class="big-arc" cx="110" cy="110" r="96" fill="none" stroke="#0D9E89" stroke-width="12"
+          stroke-dasharray="603" stroke-dashoffset="603" stroke-linecap="round" transform="rotate(-90 110 110)"/>
+        <text class="score-pop" x="110" y="102" text-anchor="middle" font-size="54" font-weight="500" fill="#fff" font-family="DM Sans,sans-serif" id="liveScore">65</text>
+        <text x="110" y="124" text-anchor="middle" font-size="13" fill="#8AAFC8" font-family="DM Sans,sans-serif">coherence</text>
+        <text x="110" y="142" text-anchor="middle" font-size="11" fill="#5DCAA5" font-family="DM Sans,sans-serif">↑ rising</text>
+      </svg>
+    </div>
+    <div class="arc-bar">
+      <div class="arc-bar-label"><span>Chaos</span><span style="color:var(--teal);">● Semangat</span></div>
+      <div class="arc-bar-track"><div class="arc-bar-fill" id="arcFill"></div></div>
+    </div>
+    <div class="live-insts">
+      <div class="li-tile on"><div class="li-name">Gong</div><div class="li-state">drone</div></div>
+      <div class="li-tile on"><div class="li-name">Rebab</div><div class="li-state">active</div></div>
+      <div class="li-tile warm"><div class="li-name">Gendang</div><div class="li-state">AI</div></div>
+      <div class="li-tile"><div class="li-name">Serunai</div><div class="li-state">standby</div></div>
+    </div>
+    <div class="eeg-card">
+      <div class="eeg-label">
+        <span>Live EEG</span>
+        <span class="eeg-live"><span class="eeg-dot"></span>Recording</span>
+      </div>
+      <div class="eeg-wave"><canvas class="eeg-canvas" id="eegCanvas"></canvas></div>
+    </div>
+    <button class="end-btn" onclick="showSemangat()">End session</button>
+    <div style="height:12px;"></div>
+  </div>
+
+  <!-- ══ SCREEN: SEMANGAT ══ -->
+  <div class="screen" id="sc-semangat" style="position:relative;min-height:760px;">
+    <div class="semangat-bg">
+      <svg class="sg-ring1" width="360" height="360" viewBox="0 0 360 360"><circle cx="180" cy="180" r="170" fill="none" stroke="#F0A500" stroke-width="1"/></svg>
+      <svg class="sg-ring2" width="280" height="280" viewBox="0 0 280 280"><circle cx="140" cy="140" r="130" fill="none" stroke="#F0A500" stroke-width="1"/></svg>
+      <svg class="sg-ring3" width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="none" stroke="#F0A500" stroke-width="1"/></svg>
+    </div>
+    <div class="semangat-content" style="padding:24px 0 0;">
+      <div class="semangat-eyebrow">Semangat achieved</div>
+      <svg style="display:block;margin:0 auto;" width="200" height="200" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="88" fill="#100800"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#1A1000" stroke-width="12"/>
+        <circle class="gold-arc" cx="100" cy="100" r="80" fill="none" stroke="#F0A500" stroke-width="12"
+          stroke-dasharray="503" stroke-dashoffset="503" stroke-linecap="round" transform="rotate(-90 100 100)"/>
+        <text class="gold-score" x="100" y="93" text-anchor="middle" font-size="48" font-weight="500" fill="#F0A500" font-family="DM Sans,sans-serif">98</text>
+        <text x="100" y="115" text-anchor="middle" font-size="12" fill="#D4A853" font-family="DM Sans,sans-serif">coherence</text>
+      </svg>
+      <div class="semangat-quote">"Your mind has found its irama."</div>
+      <div class="semangat-stats">
+        <div class="ss-card"><div class="ss-n">20m</div><div class="ss-l">Duration</div></div>
+        <div class="ss-card"><div class="ss-n">98</div><div class="ss-l">Peak score</div></div>
+        <div class="ss-card"><div class="ss-n">+23</div><div class="ss-l">vs last</div></div>
+      </div>
+      <button class="share-btn" onclick="showScreen('sc-dash')">View full report</button>
+      <button class="btn-secondary" style="margin-top:10px;" onclick="showScreen('sc-home')">Back to home</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: DASHBOARD ══ -->
+  <div class="screen" id="sc-dash">
+    <div class="dash-header">
+      <div class="dash-title">Your brain health</div>
+      <div class="dash-sub">14-day streak · Core plan</div>
+    </div>
+    <div class="score-row">
+      <div class="score-card"><div class="sc-num">78</div><div class="sc-label">Coherence</div><div class="sc-sub">↑ +12</div></div>
+      <div class="score-card gold-card"><div class="sc-num gold">✓</div><div class="sc-label">Semangat</div><div class="sc-sub" style="color:var(--gold-m);">Today</div></div>
+      <div class="score-card"><div class="sc-num">14</div><div class="sc-label">Streak</div><div class="sc-sub">days</div></div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-header"><div class="trend-title">7-day coherence trend</div><div class="trend-range">This week</div></div>
+      <div class="chart-area"><canvas id="trendChart"></canvas></div>
+      <div class="chart-days">
+        <span class="chart-day">Mon</span><span class="chart-day">Tue</span><span class="chart-day">Wed</span>
+        <span class="chart-day">Thu</span><span class="chart-day">Fri</span><span class="chart-day">Sat</span>
+        <span class="chart-day today">Sun</span>
+      </div>
+    </div>
+    <div class="band-card">
+      <div class="band-title">Brainwave breakdown</div>
+      <div class="band-row">
+        <div class="band-name">Alpha</div>
+        <div class="band-track"><div class="band-fill" style="width:72%;background:var(--teal);"></div></div>
+        <div class="band-pct" style="color:var(--teal);">72%</div>
+      </div>
+      <div class="band-row">
+        <div class="band-name">Theta</div>
+        <div class="band-track"><div class="band-fill" style="width:55%;background:var(--teal-l);"></div></div>
+        <div class="band-pct" style="color:var(--teal-l);">55%</div>
+      </div>
+      <div class="band-row">
+        <div class="band-name">Beta</div>
+        <div class="band-track"><div class="band-fill" style="width:28%;background:var(--gold-m);"></div></div>
+        <div class="band-pct" style="color:var(--gold-m);">28%</div>
+      </div>
+      <div class="band-row" style="margin-bottom:0;">
+        <div class="band-name">Delta</div>
+        <div class="band-track"><div class="band-fill" style="width:15%;background:#3A5A72;"></div></div>
+        <div class="band-pct" style="color:#3A5A72;">15%</div>
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">Today's AI insight</div>
+      <div class="insight-text">Your alpha power peaks when Rebab plays in the 8–10 Hz range. Your AI model has adjusted your default timbre accordingly. Session quality is trending up.</div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="showScreen('sc-home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('sc-home')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span>Session</span>
+      </div>
+      <div class="nav-item active" onclick="showScreen('sc-dash')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Stats</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('sc-profile')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: PROFILE ══ -->
+  <div class="screen" id="sc-profile">
+    <div class="profile-header">
+      <div class="profile-avatar">JZ</div>
+      <div>
+        <div class="profile-name">Jeffrey Zauhari</div>
+        <div class="profile-tier">Core plan · airama.ai</div>
+        <div class="profile-streak">14-day streak · 82% model trained</div>
+      </div>
+    </div>
+    <div class="rl-card">
+      <div class="rl-header"><div class="rl-title">AI personalisation progress</div><div class="rl-pct">82%</div></div>
+      <div class="rl-track"><div class="rl-fill"></div></div>
+      <div class="rl-desc">Your RL model improves with every session. At 100%, it knows your brain as well as you do. Estimated completion in 4 sessions.</div>
+    </div>
+    <div class="sg-grid-card">
+      <div class="sg-grid-title">Semangat history · this month</div>
+      <div class="sg-grid">
+        <div class="sg-cell reached"></div><div class="sg-cell reached"></div><div class="sg-cell reached"></div>
+        <div class="sg-cell partial"></div><div class="sg-cell"></div><div class="sg-cell reached"></div>
+        <div class="sg-cell reached"></div><div class="sg-cell"></div><div class="sg-cell"></div>
+        <div class="sg-cell"></div><div class="sg-cell reached"></div><div class="sg-cell reached"></div>
+        <div class="sg-cell reached"></div><div class="sg-cell reached"></div><div class="sg-cell"></div>
+        <div class="sg-cell"></div><div class="sg-cell"></div><div class="sg-cell"></div>
+        <div class="sg-cell"></div><div class="sg-cell"></div><div class="sg-cell"></div>
+      </div>
+      <div class="sg-legend">
+        <div class="sg-leg"><div class="sg-leg-dot" style="background:var(--gold);"></div>Semangat reached</div>
+        <div class="sg-leg"><div class="sg-leg-dot" style="background:var(--card2);border:1px solid rgba(240,165,0,.3);"></div>Session only</div>
+        <div class="sg-leg"><div class="sg-leg-dot" style="background:var(--navy);"></div>No session</div>
+      </div>
+    </div>
+    <div class="settings-list">
+      <div class="settings-item">
+        <div class="si-left">
+          <div class="si-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
+          <div><div class="si-text">Headband connected</div><div class="si-sub">A.Irama v1.0 · 84% battery</div></div>
+        </div>
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);"></div>
+      </div>
+      <div class="settings-item" onclick="toggleSetting(this)">
+        <div class="si-left">
+          <div class="si-icon"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+          <div><div class="si-text">Haptic feedback</div><div class="si-sub">Vibrate at Semangat</div></div>
+        </div>
+        <div class="toggle" onclick="this.classList.toggle('off')"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="settings-item">
+        <div class="si-left">
+          <div class="si-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <div><div class="si-text">Timbre pack</div><div class="si-sub">Malay · Core</div></div>
+        </div>
+        <div class="si-right">›</div>
+      </div>
+      <div class="settings-item">
+        <div class="si-left">
+          <div class="si-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div><div class="si-text">Privacy</div><div class="si-sub">EEG never leaves device</div></div>
+        </div>
+        <div class="si-right">›</div>
+      </div>
+      <div class="settings-item">
+        <div class="si-left">
+          <div class="si-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg></div>
+          <div><div class="si-text">Account</div><div class="si-sub">jeffrey@airama.ai</div></div>
+        </div>
+        <div class="si-right">›</div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="showScreen('sc-home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('sc-home')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span>Session</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('sc-dash')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Stats</span>
+      </div>
+      <div class="nav-item active" onclick="showScreen('sc-profile')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .phone -->
+</div><!-- end .shell-wrap -->
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'sc-session') startSession();
+  if (id === 'sc-dash') drawTrendChart();
+}
+
+function selectMode(m) {
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('mp-' + m).classList.add('active');
+}
+
+// ── EEG CANVAS ANIMATION ──────────────────────────────────
+let eegT = 0, eegAnim;
+function startEEG() {
+  const canvas = document.getElementById('eegCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width  = canvas.offsetWidth  * window.devicePixelRatio;
+  canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+
+  function drawWave() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.beginPath();
+    ctx.strokeStyle = '#0D9E89';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+    for (let x = 0; x < W; x++) {
+      const t = (x / W) * Math.PI * 8 + eegT;
+      const y = H/2 + Math.sin(t) * 10 + Math.sin(t*2.3) * 5 + Math.sin(t*0.7) * 7 + (Math.random()-0.5)*2;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    eegT += 0.12;
+    eegAnim = requestAnimationFrame(drawWave);
+  }
+  if (eegAnim) cancelAnimationFrame(eegAnim);
+  drawWave();
+}
+
+// ── SESSION TIMER ─────────────────────────────────────────
+let sessionInterval, sessionSeconds = 1124;
+function startSession() {
+  clearInterval(sessionInterval);
+  startEEG();
+  sessionInterval = setInterval(() => {
+    sessionSeconds = Math.max(0, sessionSeconds - 1);
+    const m = Math.floor(sessionSeconds / 60);
+    const s = sessionSeconds % 60;
+    const el = document.getElementById('sessionTimer');
+    if (el) el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    // Animate score up
+    const scoreEl = document.getElementById('liveScore');
+    if (scoreEl) {
+      const score = Math.min(98, 65 + Math.floor((1124 - sessionSeconds) / 11));
+      scoreEl.textContent = score;
+    }
+  }, 1000);
+}
+
+function showSemangat() {
+  clearInterval(sessionInterval);
+  if (eegAnim) cancelAnimationFrame(eegAnim);
+  showScreen('sc-semangat');
+}
+
+// ── TREND CHART ───────────────────────────────────────────
+function drawTrendChart() {
+  const canvas = document.getElementById('trendChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width  = canvas.offsetWidth  * window.devicePixelRatio || 300;
+  canvas.height = canvas.offsetHeight * window.devicePixelRatio || 80;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth || 300, H = canvas.offsetHeight || 80;
+  const data = [52, 58, 55, 64, 62, 70, 78];
+  const minV = 40, maxV = 90;
+  const pad = 8;
+  const sw = (W - pad*2) / (data.length - 1);
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Area fill
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = pad + i * sw;
+    const y = H - pad - ((v - minV) / (maxV - minV)) * (H - pad*2);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(pad + (data.length-1)*sw, H); ctx.lineTo(pad, H); ctx.closePath();
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, 'rgba(13,158,137,.25)');
+  grad.addColorStop(1, 'rgba(13,158,137,0)');
+  ctx.fillStyle = grad; ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = '#0D9E89'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+  data.forEach((v, i) => {
+    const x = pad + i * sw;
+    const y = H - pad - ((v - minV) / (maxV - minV)) * (H - pad*2);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots
+  data.forEach((v, i) => {
+    const x = pad + i * sw;
+    const y = H - pad - ((v - minV) / (maxV - minV)) * (H - pad*2);
+    ctx.beginPath();
+    ctx.arc(x, y, i === data.length-1 ? 4 : 3, 0, Math.PI*2);
+    ctx.fillStyle = i === data.length-1 ? '#0D9E89' : 'rgba(13,158,137,.6)';
+    ctx.fill();
+  });
+}
+
+// ── TOGGLE ──────────────────────�
+// Toggle switches are handled inline via onclick="this.classList.toggle('off')"
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  showScreen('sc-welcome');
+});
+</script>
+
+<div style="text-align:center;padding:16px 0 24px;font-size:10px;color:#3A5A72;letter-spacing:.08em;">© 2026 A.Irama. All rights reserved.</div>
+
+</body>
+</html>
